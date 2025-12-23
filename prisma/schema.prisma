@@ -1,0 +1,116 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Store {
+  id                String    @id @default(cuid())
+  name              String
+  email             String    @unique
+  phone             String?
+  address           String?
+  lineChannelId     String?   @map("line_channel_id")
+  lineChannelSecret String?   @map("line_channel_secret")
+  lineAccessToken   String?   @map("line_access_token")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  // 關聯
+  businessHours BusinessHours[]
+  barbers       Barber[]
+  services      Service[]
+  bookings      Booking[]
+  messageLogs   MessageLog[]
+
+  @@map("stores")
+}
+
+model BusinessHours {
+  id        String  @id @default(cuid())
+  storeId   String  @map("store_id")
+  dayOfWeek Int     @map("day_of_week") // 0=Sunday, 1=Monday, ...
+  openTime  String  @map("open_time") // HH:mm format
+  closeTime String  @map("close_time") // HH:mm format
+  isClosed  Boolean @default(false) @map("is_closed")
+
+  // 關聯
+  store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@map("business_hours")
+}
+
+model Barber {
+  id          String   @id @default(cuid())
+  storeId     String   @map("store_id")
+  name        String
+  email       String?
+  specialties String[]
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  // 關聯
+  store    Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  bookings Booking[]
+
+  @@map("barbers")
+}
+
+model Service {
+  id          String  @id @default(cuid())
+  storeId     String  @map("store_id")
+  name        String
+  duration    Int // 分鐘
+  price       Decimal? @db.Decimal(10, 2)
+  description String?
+  isActive    Boolean @default(true) @map("is_active")
+
+  // 關聯
+  store    Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  bookings Booking[]
+
+  @@map("services")
+}
+
+model Booking {
+  id              String   @id @default(cuid())
+  storeId         String   @map("store_id")
+  barberId        String   @map("barber_id")
+  serviceId       String   @map("service_id")
+  customerName    String   @map("customer_name")
+  customerContact String   @map("customer_contact")
+  contactType     String   @map("contact_type") // 'line' or 'email'
+  startTime       DateTime @map("start_time")
+  endTime         DateTime @map("end_time")
+  status          String   @default("confirmed") // 'confirmed', 'cancelled', 'completed'
+  notes           String?
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  // 關聯
+  store   Store   @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  barber  Barber  @relation(fields: [barberId], references: [id], onDelete: Cascade)
+  service Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  @@map("bookings")
+}
+
+model MessageLog {
+  id              String   @id @default(cuid())
+  storeId         String   @map("store_id")
+  customerContact String   @map("customer_contact")
+  contactType     String   @map("contact_type") // 'line' or 'email'
+  messageType     String   @map("message_type") // 'incoming' or 'outgoing'
+  content         String
+  processedAt     DateTime @default(now()) @map("processed_at")
+
+  // 關聯
+  store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@map("message_logs")
+}

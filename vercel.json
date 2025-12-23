@@ -1,0 +1,59 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/next"
+    }
+  ],
+  "env": {
+    "DATABASE_URL": "@database-url",
+    "LINE_CHANNEL_ID": "@line-channel-id",
+    "LINE_CHANNEL_SECRET": "@line-channel-secret",
+    "LINE_CHANNEL_ACCESS_TOKEN": "@line-channel-access-token",
+    "SENDGRID_API_KEY": "@sendgrid-api-key",
+    "SENDGRID_FROM_EMAIL": "@sendgrid-from-email",
+    "NEXTAUTH_SECRET": "@nextauth-secret",
+    "NEXTAUTH_URL": "@nextauth-url",
+    "WEBHOOK_BASE_URL": "@webhook-base-url",
+    "NODE_ENV": "production"
+  },
+  "functions": {
+    "src/app/api/**/*.js": {
+      "maxDuration": 30
+    }
+  },
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET, POST, PUT, DELETE, OPTIONS"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "Content-Type, Authorization"
+        }
+      ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/health",
+      "destination": "/api/monitoring/health"
+    },
+    {
+      "source": "/ready",
+      "destination": "/api/monitoring/ready"
+    },
+    {
+      "source": "/live",
+      "destination": "/api/monitoring/live"
+    }
+  ]
+}
