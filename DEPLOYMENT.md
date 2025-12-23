@@ -84,10 +84,42 @@
 2. **新增環境變數**
    根據以下清單新增所有必要的環境變數：
 
-#### 資料庫設定
+#### 資料庫設定 (Supabase)
 ```
 名稱: DATABASE_URL
-值: postgresql://username:password@host:port/database
+值: postgres://postgres.jxgrhjtonxnoyjixyvqc:3XVb7IvlLaKJ8poC@aws-1-ap-northeast-1.pooler.supabase.com:6543/postgres?sslmode=require&pgbouncer=true
+環境: Production, Preview, Development
+
+名稱: POSTGRES_URL
+值: postgres://postgres.jxgrhjtonxnoyjixyvqc:3XVb7IvlLaKJ8poC@aws-1-ap-northeast-1.pooler.supabase.com:6543/postgres?sslmode=require&supa=base-pooler.x
+環境: Production, Preview, Development
+
+名稱: POSTGRES_URL_NON_POOLING
+值: postgres://postgres.jxgrhjtonxnoyjixyvqc:3XVb7IvlLaKJ8poC@aws-1-ap-northeast-1.pooler.supabase.com:5432/postgres?sslmode=require
+環境: Production, Preview, Development
+
+名稱: POSTGRES_PRISMA_URL
+值: postgres://postgres.jxgrhjtonxnoyjixyvqc:3XVb7IvlLaKJ8poC@aws-1-ap-northeast-1.pooler.supabase.com:6543/postgres?sslmode=require&pgbouncer=true
+環境: Production, Preview, Development
+
+名稱: SUPABASE_URL
+值: https://jxgrhjtonxnoyjixyvqc.supabase.co
+環境: Production, Preview, Development
+
+名稱: SUPABASE_ANON_KEY
+值: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4Z3JoanRvbnhub3lqaXh5dnFjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY0NzM2ODEsImV4cCI6MjA4MjA0OTY4MX0.OtzHVZzfvRtiW0d4n74PC5qHwpg2pVDW7DQUlFcARrE
+環境: Production, Preview, Development
+
+名稱: SUPABASE_SERVICE_ROLE_KEY
+值: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4Z3JoanRvbnhub3lqaXh5dnFjIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NjQ3MzY4MSwiZXhwIjoyMDgyMDQ5NjgxfQ.Mfu102z4k2wU8-htTOqNL7d7gc4LcqEMoUc3AIWXCBc
+環境: Production, Preview, Development
+
+名稱: NEXT_PUBLIC_SUPABASE_URL
+值: https://jxgrhjtonxnoyjixyvqc.supabase.co
+環境: Production, Preview, Development
+
+名稱: NEXT_PUBLIC_SUPABASE_ANON_KEY
+值: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4Z3JoanRvbnhub3lqaXh5dnFjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY0NzM2ODEsImV4cCI6MjA4MjA0OTY4MX0.OtzHVZzfvRtiW0d4n74PC5qHwpg2pVDW7DQUlFcARrE
 環境: Production, Preview, Development
 ```
 
@@ -152,7 +184,48 @@ node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
 
 ## 資料庫設定
 
-### 步驟 1: 建立 Vercel Postgres 資料庫
+### 選項 A: 使用 Supabase PostgreSQL (推薦)
+
+1. **建立 Supabase 專案**
+   - 前往 [Supabase Dashboard](https://supabase.com/dashboard)
+   - 點擊 "New Project"
+   - 選擇您的組織
+   - 輸入專案名稱 (例如: `booking-system`)
+   - 輸入資料庫密碼 (請記住此密碼)
+   - 選擇區域 (建議選擇與您的 Vercel 部署相同的區域)
+   - 點擊 "Create new project"
+
+2. **取得資料庫連接字串**
+   - 專案建立完成後，前往 "Settings" > "Database"
+   - 在 "Connection string" 區域找到 "URI"
+   - 複製連接字串，格式如下：
+     ```
+     postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres
+     ```
+   - 將 `[YOUR-PASSWORD]` 替換為您設定的資料庫密碼
+
+3. **設定 Supabase 環境變數**
+   在 Vercel 中新增以下環境變數：
+   ```
+   名稱: DATABASE_URL
+   值: postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres
+   環境: Production, Preview, Development
+   
+   名稱: SUPABASE_URL
+   值: https://[PROJECT-REF].supabase.co
+   環境: Production, Preview, Development
+   
+   名稱: SUPABASE_ANON_KEY
+   值: 您的 Supabase Anonymous Key
+   環境: Production, Preview, Development
+   ```
+
+4. **取得 Supabase API Keys**
+   - 在 Supabase Dashboard 中，前往 "Settings" > "API"
+   - 複製 "Project URL" 和 "anon public" key
+   - 這些將用於前端直接連接 (如果需要)
+
+### 選項 B: 使用 Vercel Postgres
 
 1. **在 Vercel Dashboard 中**
    - 進入您的專案
@@ -168,6 +241,44 @@ node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
    - 您可以在 "Settings" > "Environment Variables" 中確認
 
 ### 步驟 2: 執行資料庫遷移
+
+#### 使用 Supabase 的遷移步驟
+
+1. **本地設定**
+   ```bash
+   # 複製環境變數範本
+   cp .env.example .env.local
+   
+   # 編輯 .env.local，填入您的 Supabase 連接資訊
+   DATABASE_URL="postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres"
+   SUPABASE_URL="https://[PROJECT-REF].supabase.co"
+   SUPABASE_ANON_KEY="your_supabase_anon_key"
+   ```
+
+2. **執行遷移**
+   ```bash
+   # 生成 Prisma Client
+   npm run db:generate
+   
+   # 推送資料庫 schema 到 Supabase
+   npm run db:push
+   
+   # 執行種子資料 (可選)
+   npm run db:seed
+   ```
+
+3. **驗證 Supabase 中的資料表**
+   - 前往 Supabase Dashboard
+   - 點擊 "Table Editor"
+   - 確認所有資料表已正確建立：
+     - stores
+     - business_hours
+     - barbers
+     - services
+     - bookings
+     - message_logs
+
+#### 使用 Vercel Postgres 的遷移步驟
 
 1. **本地設定**
    ```bash
@@ -317,7 +428,20 @@ curl https://your-domain.vercel.app/api/monitoring/status
 
 #### 2. 資料庫連接失敗
 **錯誤**: Database connection failed
-**解決方案**:
+
+**Supabase 解決方案**:
+```bash
+# 檢查 Supabase 連接字串格式
+# 正確格式: postgresql://postgres:[PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres
+
+# 確認 Supabase 專案狀態
+# 前往 Supabase Dashboard 檢查專案是否正常運行
+
+# 測試本地連接
+npm run db:health
+```
+
+**Vercel Postgres 解決方案**:
 ```bash
 # 檢查資料庫連接字串格式
 # 正確格式: postgresql://username:password@host:port/database
@@ -326,7 +450,39 @@ curl https://your-domain.vercel.app/api/monitoring/status
 npm run db:health
 ```
 
-#### 3. LINE Webhook 無法接收訊息
+#### 3. Supabase 特定問題
+
+**錯誤**: Connection pool timeout
+**解決方案**:
+- Supabase 免費方案有連接數限制 (最多 60 個並發連接)
+- 在 Prisma schema 中設定連接池：
+```prisma
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL") // 用於遷移
+}
+```
+- 考慮升級到 Supabase Pro 方案以獲得更多連接數
+
+**錯誤**: Row Level Security (RLS) 阻擋存取
+**解決方案**:
+- 在 Supabase Dashboard 中前往 "Authentication" > "Policies"
+- 暫時停用 RLS 或設定適當的存取政策
+- 對於後端 API，通常需要停用 RLS 或使用 service role key
+
+**錯誤**: Migration failed on Supabase
+**解決方案**:
+```bash
+# 使用 Prisma 的 shadow database 功能
+# 在 .env 中新增：
+SHADOW_DATABASE_URL="postgresql://postgres:[PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres?schema=shadow"
+
+# 或使用 db push 而非 migrate
+npm run db:push
+```
+
+#### 4. LINE Webhook 無法接收訊息
 **錯誤**: LINE webhook not receiving messages
 **解決方案**:
 - 確認 Webhook URL 設定正確
