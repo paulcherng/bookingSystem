@@ -356,12 +356,46 @@ npm run db:migrate:prod
    - 前往 "Settings" > "Sender Authentication"
    - 驗證您的寄件者電子郵件地址或網域
 
+## 部署步驟總結
+
+### 快速部署（最小設定）
+
+如果您想要快速部署並稍後設定 LINE 和 SendGrid，請按照以下步驟：
+
+1. **設定必要的環境變數**
+   ```bash
+   # 資料庫（必要）
+   DATABASE_URL = [您的 Supabase 連接字串]
+   SUPABASE_URL = https://jxgrhjtonxnoyjixyvqc.supabase.co
+   SUPABASE_ANON_KEY = [您的 Supabase Anon Key]
+   
+   # NextAuth（必要）
+   NEXTAUTH_SECRET = [生成的隨機密鑰]
+   NEXTAUTH_URL = https://your-domain.vercel.app
+   WEBHOOK_BASE_URL = https://your-domain.vercel.app
+   NODE_ENV = production
+   
+   # 臨時設定（讓 build 通過）
+   LINE_CHANNEL_ID = temp_channel_id
+   LINE_CHANNEL_SECRET = temp_channel_secret
+   LINE_CHANNEL_ACCESS_TOKEN = temp_access_token
+   SENDGRID_API_KEY = temp_api_key
+   SENDGRID_FROM_EMAIL = noreply@example.com
+   ```
+
+2. **部署應用程式**
+   - 推送程式碼到 GitHub
+   - Vercel 會自動部署
+
+3. **稍後設定真實的 LINE 和 SendGrid 參數**
+   - 當您準備好 LINE Bot 和 SendGrid 設定時
+   - 只需要更新對應的環境變數
+   - Vercel 會自動重新部署
+
 ## 部署後驗證
 
 ### 步驟 1: 重新部署
-
 設定完所有環境變數後：
-1. 前往 Vercel Dashboard
 2. 進入您的專案
 3. 點擊 "Deployments" 標籤
 4. 點擊 "Redeploy" 重新部署最新版本

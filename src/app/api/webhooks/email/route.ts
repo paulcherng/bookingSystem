@@ -70,7 +70,13 @@ export async function POST(request: NextRequest) {
     // 處理每個郵件事件（使用重試機制）
     let processedCount = 0
     await WebhookMiddleware.handleWebhookWithRetry(async () => {
-      const emailService = new EmailService(process.env.SENDGRID_API_KEY!)
+      const apiKey = process.env.SENDGRID_API_KEY
+      if (!apiKey || apiKey === '' || apiKey === 'temp_api_key') {
+        console.warn('SendGrid API key not configured, skipping email processing')
+        return
+      }
+      
+      const emailService = new EmailService(apiKey)
       
       for (const email of emails) {
         // 只處理收到的郵件（不是發送狀態更新）

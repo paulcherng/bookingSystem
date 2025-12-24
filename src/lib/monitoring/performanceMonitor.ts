@@ -317,13 +317,14 @@ export class HealthMonitor {
     })
 
     // LINE 服務檢查
-    if (process.env.LINE_CHANNEL_ACCESS_TOKEN) {
+    const lineToken = process.env.LINE_CHANNEL_ACCESS_TOKEN
+    if (lineToken && lineToken !== '' && lineToken !== 'temp_access_token') {
       this.registerHealthCheck('line_service', async () => {
         try {
           const response = await fetch('https://api.line.me/v2/bot/info', {
             method: 'GET',
             headers: {
-              'Authorization': `Bearer ${process.env.LINE_CHANNEL_ACCESS_TOKEN}`,
+              'Authorization': `Bearer ${lineToken}`,
               'Content-Type': 'application/json'
             }
           })
@@ -346,13 +347,14 @@ export class HealthMonitor {
     }
 
     // SendGrid 服務檢查
-    if (process.env.SENDGRID_API_KEY) {
+    const sendgridKey = process.env.SENDGRID_API_KEY
+    if (sendgridKey && sendgridKey !== '' && sendgridKey !== 'temp_api_key') {
       this.registerHealthCheck('sendgrid_service', async () => {
         try {
           const response = await fetch('https://api.sendgrid.com/v3/user/account', {
             method: 'GET',
             headers: {
-              'Authorization': `Bearer ${process.env.SENDGRID_API_KEY}`,
+              'Authorization': `Bearer ${sendgridKey}`,
               'Content-Type': 'application/json'
             }
           })

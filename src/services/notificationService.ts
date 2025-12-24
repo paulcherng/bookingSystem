@@ -159,7 +159,8 @@ export class NotificationService {
     storeId?: string
   ): Promise<{ success: boolean; error?: string; retryCount?: number }> {
     const apiKey = process.env.SENDGRID_API_KEY
-    if (!apiKey) {
+    if (!apiKey || apiKey === '' || apiKey === 'temp_api_key') {
+      console.warn('SendGrid API key not configured, skipping email notification')
       return { success: false, error: 'SendGrid API key not configured' }
     }
 
